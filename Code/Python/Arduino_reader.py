@@ -10,13 +10,14 @@ Features to be added:
 import serial
 import time
 import sys
+import os
 
 serialCom = serial.Serial("COM4", 9600)
-
+folder = r"C:\Users\zl948\Pictures"
 
 while True:
     s_bytes = serialCom.readline()
     decoded_bytes = s_bytes.decode("utf-8").strip("\r\n")
     print(decoded_bytes)
-    with open(r"C:\Users\liuzy\Downloads\rec.txt", "a") as f:
-        f.write(time.asctime() + ": " + decoded_bytes + "\n")
+    with open(os.path.join(folder, "rec.txt"), "a") as f:
+        f.write(time.asctime() + "," + decoded_bytes + "\n")

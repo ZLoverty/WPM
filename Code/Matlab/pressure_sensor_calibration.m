@@ -36,6 +36,7 @@ Data: (air in tube)
 37 - 60 - 5.8
 %}
 
+%{
 %%
 for i = 7: 37
     pressure(i).data = eval(sprintf("Dev3_%d", i));
@@ -45,7 +46,7 @@ end
 for i = 1: 31
     pressure_air(i).data = pressure(i+6).data;
 end
-
+%}
 %% volt
 for i = 1: 31
     volt(i) = mean(pressure_air(i).data.that)

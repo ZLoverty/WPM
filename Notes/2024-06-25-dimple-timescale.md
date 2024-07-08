@@ -4,11 +4,66 @@ date: Jun 25, 2024
 
 # Dimple time scale
 
-The dimple formed in a thin layer of liquid around a porous material is unstable. Surface-tension-induced pressure gradient has the tendency to smooth it out. However, when the liquid film is sufficiently thin, the dimple can stay obvious for quite long time. It turns out that, as the film gets thinner, the time scale of the smoothing out increases. In this note, I analyze this time scale.
-
-The surface profile of the thin liquid film is shown in the sketch below. $R_2$ and $R_3$ are the radii of curvature of the thin film, at the dimple and the apex of the bulk film respectively. Due to the difference in the curvature, there is a pressure difference between the dimple and the apex. We assume here that the film is thin enough, so that hydrostatic pressure is negligible (be precise how thin). 
+The surface profile of the thin liquid film with a dimple is shown in the sketch below.
 
 ![picture 0](/assets/images/2024/06/dimple-sketch.png)  
+
+The dimple formed in a thin layer of liquid around a porous material is unstable. Surface-tension-induced pressure gradient has the tendency to smooth it out. However, whether this tendency will eventually smooth out the dimple or not depends on the competition between the surface tension induced pressure gradient and the pressure gradient required to drive the lubrication flow in the thin film. This competition can be characterized by capillary number $Ca$:
+
+$$
+Ca = \frac{\Delta P_l}{\Delta P_s}, \tag{1}
+$$
+
+where $\Delta P_l$ and $\Delta P_s$ are the lubrication flow pressure and the surface tension pressure, respectively. The scale of $\Delta P_l$ can be obtained from the NS equation under lubrication approximation
+
+$$
+-\frac{\partial p}{\partial x} + \eta \frac{\partial ^2 v_x}{\partial y^2} = 0, \tag{2}
+$$
+
+consider thin film, where the scale of $y$ is much smaller than the scale of $x$, we can nondimensionalize the equation using $\tilde p = p/p_0$, $\tilde x=x/L$, $\tilde v_x = v_x / U$, $\tilde y = y/h$:
+
+$$
+-\frac{p_0}{L}\frac{\partial \tilde p}{\partial \tilde x} + \frac{\eta U}{h^2} \frac{\partial ^2 \tilde v_x}{\partial \tilde y^2} = 0, \tag{3}
+$$
+
+which gives us the scale of $\Delta P_l$:
+
+$$
+\Delta P_l \sim p_0 \sim \frac{\eta U L}{h^2}. \tag{4}
+$$
+
+The scale of the surface tension induce pressure drop can be inferred from Young-Laplace equation:
+
+$$
+\Delta P = \gamma (\frac{1}{R_1} + \frac{1}{R_2}). \tag{5}
+$$
+
+If we postulate that the radius of curvature at the dimple is on the order of the film length $L$, we have:
+
+$$
+\Delta P_s \sim \frac{\gamma}{L}. \tag{6}
+$$
+
+If we plug Eqs. (4) and (6) to Eq. (1), we get the capillary number
+
+$$
+Ca = \frac{\eta U}{\gamma} \left( \frac{L}{h} \right) ^2. \tag{7}
+$$
+
+Let $U=L/\tau$, and reorganize Eq. (7), we can see how the characteristic time scale depends on the film thickness $h$:
+
+$$
+\tau = \frac{\eta L^3}{Ca\cdot \gamma} \frac{1}{h^2}. \tag{8}
+$$
+
+We plot this $\tau$-$h$ relation at various $Ca$ below.
+
+![picture 0](/assets/images/2024/07/dimple%20time%20scale%20depending%20on%20film%20thickness.png)  
+
+
+## Critical film thickness
+
+Alternatively, we can fix the time scale and seek for a critical film thickness.
 
 According to Young-Laplace equation, the pressure difference can be written as
 

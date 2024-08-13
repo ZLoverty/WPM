@@ -44,51 +44,60 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 # Parameters
-R = 1.0  # Radius of the domain
+R = 1.0e-3  # Radius of the domain
 N = 100  # Number of grid points
-dr = R / N  # Grid spacing
-T = 1.0  # Total time
+T = 1  # Total time
 mu = 1.0  # Viscosity
-gamma = 1.0  # Surface tension
+sigma = 1.0  # Surface tension
 P0 = -0.1  # Initial negative pressure at the boundary
-alpha = 1.0  # Decay rate of the negative pressure
+alpha = 1.0e-2  # Decay rate of the negative pressure
+rho = 997  # Density of water
+g = 9.8  # Gravitational acceleration
 
 # Initial condition: small perturbation on a flat film
-h0 = np.ones(N) + 0.01 * np.random.randn(N)
-r = np.linspace(dr, R, N)  # Avoid r = 0 to prevent division by zero
+r = np.linspace(R/N, R, N)  # Avoid r = 0 to prevent division by zero
+h0 = np.ones_like(r) * 1.0e-3  # Initial film thickness
+h0[-90:] = 0
 
-# Function to compute the first derivative
-def first_derivative(f, dr):
-    return (np.roll(f, -1) - f) / dr
+# Compute initial total volume
+initial_volume = 2 * np.pi * np.trapz(r * h0, r)
 
-# Function to compute the second derivative
-def second_derivative(f, dr):
-    return (np.roll(f, -1) - 2 * f + np.roll(f, 1)) / dr**2
+def film_drainage(t, y, r, R, rho, g, mu, sigma, initial_volume):
+    h = y
+    dr = (r[2:] - r[:-2]) / 2
+    p = YL_equation(h, r, sigma, R)
+    dhdt = np.zeros(h.shape)
+    rh3 = r * h**3
+    dhdt[1:-1] = 1 / (12 * mu * r[1:-1]) * ((rh3[2:] - rh3[:-2]) * (p[2:] - p[:-2]) + 4 * rh3[1:-1] * (p[2:] - 2 * p[1:-1] + p[:-2])) / dr**2
+    dhdt[-1] = 0
+    dhdt[0] = dhdt[1]
 
-# Function to compute the Laplacian in cylindrical coordinates
-def laplacian_cylindrical(f, r, dr):
-    d2f_dr2 = second_derivative(f, dr)
-    df_dr = first_derivative(f, dr)
-    laplacian = np.zeros_like(f)
-    laplacian[1:] = (1 / r[1:]) * df_dr[1:] + d2f_dr2[1:]
-    laplacian[0] = d2f_dr2[0]  # Handle r = 0 separately
-    return laplacian
-
-# Define the ODE system
-def thin_film_pde(t, h):
-    laplacian_h = laplacian_cylindrical(h, r, dr)
-    curvature_term = laplacian_cylindrical(h**3 * laplacian_h, r, dr)
-    dhdt = -gamma / (3 * mu) * (1 / r) * first_derivative(r * curvature_term, dr)
+    # # Compute current total volume
+    # current_volume = 2 * np.pi * np.trapz(r * h, r)
     
-    # Apply time-dependent negative pressure at the boundary
-    P_suction = P0 * np.exp(-alpha * t)
-    dhdt[-1] += P_suction / mu
+    # # Compute volume discrepancy
+    # volume_discrepancy = initial_volume - current_volume
+    
+    # # Distribute the volume discrepancy uniformly
+    # if volume_discrepancy > 0:
+    #     dhdt[1:-1] += alpha
+    # elif volume_discrepancy < 0:
+    #     dhdt[1:-1] -= alpha
     
     return dhdt
 
+def YL_equation(h, r, sigma, R):
+    dr = (r[2:] - r[:-2]) / 2
+    p = np.zeros_like(h)
+    p[1:-1] = 2 * sigma / R - sigma / r[1:-1] * (h[2:] - h[:-2]) / dr / 2 - sigma * (h[2:] - 2 * h[1:-1] + h[:-2]) / dr**2
+    p[0] = p[1]
+    p[-1] = 0
+    return p
+
 # Solve the PDE using solve_ivp with the BDF method
-t_eval = np.linspace(0, T, 100)
-solution = solve_ivp(thin_film_pde, [0, T], h0, method='BDF', t_eval=t_eval)
+t_eval = np.linspace(0, T, 10)
+solution = solve_ivp(film_drainage, [0, T], h0, method='BDF', t_eval=t_eval,
+                     args=(r, R, rho, g, mu, sigma, initial_volume), rtol=1.0e-6, atol=1.0e-6)
 
 # Debugging information
 print(f"Number of time steps in solution: {solution.y.shape[1]}")
@@ -99,20 +108,27 @@ print(f"Solver message: {solution.message}")
 if solution.y.shape[1] != len(t_eval):
     raise ValueError(f"Expected {len(t_eval)} time steps, but got {solution.y.shape[1]}")
 
-# Plot the film thickness profile at multiple time steps
-time_steps = [0, 25, 50, 75, 99]  # Indices of the time steps to visualize
-fig, axes = plt.subplots(1, len(time_steps), figsize=(15, 5), sharey=True)
+# Plot the film thickness profile at multiple time steps on the same axis
+time_steps = [0, 2, 4, 6, 8] # Indices of the time steps to visualize
+fig, ax = plt.subplots(figsize=(10, 6))
 
-for i, ax in enumerate(axes):
-    if time_steps[i] < solution.y.shape[1]:
-        ax.plot(r, solution.y[:, time_steps[i]])
-        ax.set_title(f't = {t_eval[time_steps[i]]:.2f}')
-        ax.set_xlabel('Radius')
-        if i == 0:
-            ax.set_ylabel('Film Thickness')
+for i in time_steps:
+    if i < solution.y.shape[1]:
+        ax.plot(r, solution.y[:, i], label=f't = {t_eval[i]:.2f}')
     else:
-        ax.set_title(f't = {t_eval[time_steps[i]]:.2f} (out of bounds)')
-        ax.set_xlabel('Radius')
+        ax.plot(r, solution.y[:, -1], label=f't = {t_eval[i]:.2f} (out of bounds)')
 
-plt.suptitle('Thin Liquid Film Profile at Multiple Time Steps')
-plt.show()
+ax.set_title('Thin Liquid Film Profile at Multiple Time Steps')
+ax.set_xlabel('Radius')
+ax.set_ylabel('Film Thickness')
+ax.legend()
+
+# Compute the total liquid volume over time
+total_volume = 2 * np.pi * np.trapz(np.outer(r, np.ones(len(t_eval))) * solution.y, r, axis=0)
+
+# Plot the total liquid volume over time
+fig, ax2 = plt.subplots(figsize=(10, 6))
+ax2.plot(t_eval, total_volume)
+ax2.set_title('Total Liquid Volume Over Time')
+ax2.set_xlabel('Time')
+ax2.set_ylabel('Total Volume')

@@ -43,52 +43,47 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-# Parameters
-R = 1.0  # Radius of the domain
-N = 100  # Number of grid points
-dr = R / N  # Grid spacing
-T = 1.0  # Total time
-mu = 1.0  # Viscosity
-gamma = 1.0  # Surface tension
-P0 = -0.1  # Initial negative pressure at the boundary
-alpha = 1.0  # Decay rate of the negative pressure
+# Define parameters
+sigma = 0.072  # Surface tension (N/m)
+mu = 0.001    # Viscosity (Pa.s)
+T = .1     # Total simulation time (s)
+R = 1e-3         # Radius of the domain (m)
+dr = 0.01     # Radial step size (m)
+N = 100       # Number of radial grid points
+rho = 997     # Density of water (kg/m^3)
+g = 9.8       # Gravitational acceleration (m/s^2)
+r = np.linspace(-R, R, N)  # Radial coordinate
+h0 = np.ones_like(r)*1e-4  # Initial film thickness profile
+h0[:30] = 0
+h0[-30:] = 0
 
-# Initial condition: small perturbation on a flat film
-h0 = np.ones(N) + 0.01 * np.random.randn(N)
-r = np.linspace(dr, R, N)  # Avoid r = 0 to prevent division by zero
-
-# Function to compute the first derivative
-def first_derivative(f, dr):
-    return (np.roll(f, -1) - f) / dr
-
-# Function to compute the second derivative
-def second_derivative(f, dr):
-    return (np.roll(f, -1) - 2 * f + np.roll(f, 1)) / dr**2
-
-# Function to compute the Laplacian in cylindrical coordinates
-def laplacian_cylindrical(f, r, dr):
-    d2f_dr2 = second_derivative(f, dr)
-    df_dr = first_derivative(f, dr)
-    laplacian = np.zeros_like(f)
-    laplacian[1:] = (1 / r[1:]) * df_dr[1:] + d2f_dr2[1:]
-    laplacian[0] = d2f_dr2[0]  # Handle r = 0 separately
-    return laplacian
-
-# Define the ODE system
-def thin_film_pde(t, h):
-    laplacian_h = laplacian_cylindrical(h, r, dr)
-    curvature_term = laplacian_cylindrical(h**3 * laplacian_h, r, dr)
-    dhdt = -gamma / (3 * mu) * (1 / r) * first_derivative(r * curvature_term, dr)
+def film_drainage(t, y, r, R, rho, g, mu, sigma):
     
-    # Apply time-dependent negative pressure at the boundary
-    P_suction = P0 * np.exp(-alpha * t)
-    dhdt[-1] += P_suction / mu
+    h = y
+
+    dr = (r[2:] - r[:-2]) / 2
     
+    p = YL_equation(h, r, sigma, R)
+
+    dhdt = np.zeros(h.shape)
+    rh3 = r * h**3
+    dhdt[1:-1] = 1 / (12 * mu * r[1:-1]) * ((rh3[2:] - rh3[:-2]) * (p[2:] - p[:-2]) + 4 * rh3[1:-1] * (p[2:] - 2 * p[1:-1] + p[:-2])) / dr**2
+    dhdt[-1] = 0
+    dhdt[0] = 0
+
     return dhdt
+
+def YL_equation(h, r, sigma, R):
+    dr = (r[2:] - r[:-2]) / 2
+    p = np.zeros_like(h)
+    p[1:-1] = 2 * sigma / R - sigma / np.abs(r[1:-1]) * (h[2:] - h[:-2]) / dr / 2 - sigma * (h[2:] - 2 * h[1:-1] + h[:-2]) / dr**2
+    p[0] = 0
+    p[-1] = 0
+    return p
 
 # Solve the PDE using solve_ivp with the BDF method
 t_eval = np.linspace(0, T, 100)
-solution = solve_ivp(thin_film_pde, [0, T], h0, method='BDF', t_eval=t_eval)
+solution = solve_ivp(film_drainage, [0, T], h0, method='BDF', t_eval=t_eval, args=(r, R, rho, g, mu, sigma), atol=1e-6, rtol=1e-6)  # BDF method is suitable for stiff problems
 
 # Debugging information
 print(f"Number of time steps in solution: {solution.y.shape[1]}")

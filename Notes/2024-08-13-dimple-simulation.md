@@ -46,6 +46,21 @@ $$
 U_{cl} = \frac{\sigma\kappa}{\mu} \theta (\theta^2 - \theta_s^2),
 $$
 
-where $U_{cl}$ is contact line velocity, $\sigma$ is surface tension, $\kappa$ is a coupling parameter that can be determined with experimental data, $\mu$ is viscosity and $\theta_s$ is stationary contact angle.
+where $U_{cl}$ is contact line velocity, $\sigma$ is surface tension, $\kappa$ is a coupling parameter that can be determined with experimental data, $\mu$ is viscosity and $\theta_s$ is stationary contact angle. The best result is shown below:
 
+![picture 0](/assets/images/2024/08/moving-contact-line.png)  
+
+However, running the simulation a little long would result in a very large number at `h[-1]`, despite it is already enforced to be `0` by boundary condition. It turns out that the problem comes from the constant pressure boundary condition `p[-1]=0`. By replacing it with `p[-1]=p[-2]`, the solution can run much longer with moving contact line, as shown below:
+
+![picture 1](/assets/images/2024/08/smoother-boundary-condition.png)  
+
+Modify the initial condition to increase the total liquid amount, results in the following nice dimple profile, resembles the observations in experiment. However, there are two issues: (i) the mass is not conserved. What's worse, the volume can increase due to the moving contact line even if we have a suction force induced by negative pressure at the `x=0` boundary, which is unphysical; (ii)
+
+![picture 2](/assets/images/2024/08/more-lliquid.png)  
+
+Much longer simulation, would the total volume go down eventually?
+
+![picture 3](/assets/images/2024/08/longer-simulation.png)  
+
+The contact line velocity has a free parameter, which may be used for matching the experimental dimple position and lifetime. 
 

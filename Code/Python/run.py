@@ -12,7 +12,7 @@ sigma = 0.042
 kappa = 1.2e-7    # Proportionality constant for contact line motion
 theta_s = np.deg2rad(50) # Equilibrium contact angle (degrees)
 
-folder = r"E:\WPM\Simulation\detail_Pi0_area_small_h0"
+folder = r"G:\My Drive\Research projects\WPM\Data\Simulation\detail_Pi0_area_small_h0"
 
 for area, Pi0 in zip(area_list, Pi0_list):    
     for h0 in h0_list:
@@ -21,4 +21,4 @@ for area, Pi0 in zip(area_list, Pi0_list):
         print(filename)
         # Run the simulation
         fileDir = os.path.join(folder, filename)
-        os.system(f'python dimple_simulation.py {fileDir} -a {area:.2e} -P {Pi0:.2f} --kappa {kappa:.2e}  --theta_s {theta_s:.2e} --h0 {h0:.2e} --mu {mu:.2e} --sigma {sigma:.2e}')
+        os.system(f'python dimple_simulation.py \"{fileDir}\" -a {area:.2e} -P {Pi0:.2f} --kappa {kappa:.2e}  --theta_s {theta_s:.2e} --h0 {h0:.2e} --mu {mu:.2e} --sigma {sigma:.2e}')

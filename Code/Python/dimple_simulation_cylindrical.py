@@ -21,7 +21,7 @@ optional arguments:
 
 # simulation parameters
     -T, --time : total time of the simulation (s), default to 0.02
-    -X, --X : size of the domain (m), default to 1e-2
+    -R, --R : size of the domain (m), default to 1e-2
     -N, --number : number of spatial discretization, default to 100
     -s, --save_time : Save the states every save_time (s), default to 1e-4
     
@@ -115,8 +115,8 @@ def film_drainage(t, y):
     
     dr = (r[2:] - r[:-2]) / 2
     
-    p = YL_equation(h, r)
-    # print(p[0])
+    p = YL_equation(h, r, 0)
+    
     # Reynolds equation
     dhdt = np.zeros(h.shape)
     rh3 = r * h**3
@@ -144,7 +144,7 @@ def YL_equation(h, r, q):
     p[1:-1] = - sigma / r[1:-1] * (h[2:] - h[:-2]) / dr / 2 - sigma * (h[2:] - 2 * h[1:-1] + h[:-2]) / dr**2
 
     # Boundary conditions
-    p[0] =  p_left(h, r, q)
+    p[0] =  p_left(h, r, q, p)
     p[-1] = p[-2]
     return p
 
@@ -171,20 +171,24 @@ def compute_contact_angle_0(h, r):
             angle += np.pi
         return angle
 
-def p_left(h, r, q):
+def p_left(h, r, q, p):
     """
     Calculate the pressure at the left boundary
     """
+    h_c = 5e-3 # thickness of beet slice
     # Calculate the total volume of liquid in the domain
     V = np.trapz(2*np.pi*r*h, r)
 
     # Calculate the liquid height in pores, h_p
     h_p = (V0 - V) / pore_area
-
+    print(h_p)
     # Calculate the pressure at the left boundary
-    p = Pi0 + rho * g * h_p + 8*mu*q*h_p / (np.pi*pore_radius**4)
+    if h_p < h_c:
+        pp = Pi0 + rho * g * h_p + 8*mu*q*h_p / (np.pi*pore_radius**4)
+    else:
+        pp = p[-1]
 
-    return p
+    return pp
 
 # Callback function to store previous state and dt
 class StateRecorder:

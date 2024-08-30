@@ -51,4 +51,4 @@ $$
 
 For fully filled pores, where $h_p=0.005$ m, the pressure drop is 130 Pa. By further decreasing the number of pores, we can achieve a pressure drop that is significant enough for the capillary pressure. However, we note that the flow rate used here is overestimated. In the later part of an experiment, the flow rate is only 1/10 of this estimate, so viscous dissipation is definitely not enough to balance the huge capillary pressure.
 
-Maybe there is just no such pores. Fluid goes underneath the cavities below the beet slice. 
+Maybe there is just no such pores. Fluid goes underneath the cavities below the beet slice. The cavity underneath the beet slice does not have to be the same scale as the xylem cells, but can be larger, so that it generates a negative pressure on the order of 10-100 Pa. To generate that, typically we need a cavity 100 $\mu$m in diameter. Or the same area but different shape. This is more realistic.

@@ -14,6 +14,7 @@ Edit
 ----
 May 01, 2024: Initial commit.
 Oct 09, 2024: Add docstring.
+Oct 28, 2024: Only read processed scan data with columns 't' and 'h'.
 """
 
 import matplotlib.pyplot as plt
@@ -21,6 +22,6 @@ import pandas as pd
 import sys
 
 data_path = sys.argv[1]
-surface = pd.read_csv(data_path, usecols=[1], skiprows=12, names=["height"])
-plt.plot(surface)
+surface = pd.read_csv(data_path)
+plt.plot(surface.t, surface.h)
 plt.show()

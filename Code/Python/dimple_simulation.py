@@ -137,7 +137,7 @@ def YL_equation(h, x, sigma):
     dh = (h[2:] - h[:-2]) / dx / 2
     d2h = (h[2:] - 2 * h[1:-1] + h[:-2]) / dx**2
     p = np.zeros_like(h)
-    p[1:-1] = - sigma * (1 + dh**2)**(-3/2) * d2h #+ rho * g * h[1:-1]
+    p[1:-1] = - sigma * (1 + dh**2)**(-3/2) * d2h + rho * g * h[1:-1]
     # p[1:-1] = - sigma * d2h
     # Boundary conditions
     # p[0] =  p_left(h, x, V0, Pi0, pore_area)

@@ -15,13 +15,28 @@ Edit
 May 01, 2024: Initial commit.
 Oct 09, 2024: Add docstring.
 Oct 28, 2024: Only read processed scan data with columns 't' and 'h'.
+Oct 29, 2024: Visualize the "tip". 
 """
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
+import os
+import argparse
+import pdb
 
-data_path = sys.argv[1]
+# Parse arguments
+parser = argparse.ArgumentParser(description='Examine the surface scan data.')
+parser.add_argument('data_path', type=str, help='The path to the surface scan data file.')
+parser.add_argument('--tip', type=str, default="", help='The path to keyframes.csv file, where a column "tip" is available.')
+args = parser.parse_args()
+
+data_path = args.data_path
+tip_path = args.tip
 surface = pd.read_csv(data_path)
 plt.plot(surface.t, surface.h)
+if tip_path != "":
+    name = os.path.splitext(os.path.basename(data_path))[0]
+    tip = pd.read_csv(tip_path)
+    tip = tip.loc[tip["name"]==name]
+    plt.scatter(tip.tip.dropna(), surface.h[tip.tip.dropna()], color="red")
 plt.show()

@@ -48,6 +48,7 @@ Edit
 Aug 14, 2024: Initial commit.
 Aug 15, 2024: (i) Edit the docstring to show optional arguments more accurately. (ii) Prevent the increase of total volume due to contact line movement.
 Oct 24, 2024: Change the model from micro-pore driven to meniscus rise driven.
+Nov 05, 2024: (i) Remove unused free parameters. (ii) Convert save_file to absolute path.
 """
 
 import numpy as np
@@ -61,31 +62,33 @@ import pandas as pd
 # Read constants from command line
 parser = argparse.ArgumentParser(description='Dimple simulation')
 parser.add_argument('save_file', type=str, help='File to save the solution')
-# free parameters
+
+# contact line parameters
 parser.add_argument('-k', '--kappa', type=float, default=0.005, help='Proportionality constant for contact line motion')
-parser.add_argument('-P', '--Pi0', type=float, default=-10, help='Initial pressure at the left boundary (Pa)')
 parser.add_argument('-t', '--theta_s', type=float, default=30, help='Equilibrium contact angle (degrees)')
-parser.add_argument('-a', '--pore_area', type=float, default=1.0e-3, help='Area of the pores (m^2)')
+
 # physical consts
 parser.add_argument('--mu', type=float, default=1e-2, help='Viscosity, Pa s')
 parser.add_argument('--g', type=float, default=9.8, help='Gravitational acceleration, m/s^2')
 parser.add_argument('--sigma', type=float, default=42e-3, help='Surface tension, N/m')
 parser.add_argument('--rho', type=float, default=997, help='Density of water, kg/m^3')
+
 # simulation parameters
 parser.add_argument('-T', '--time', type=float, default=100, help='Total simulation time (s)')
 parser.add_argument('-X', '--X', type=float, default=1e-2, help='Size of the domain (m)')
 parser.add_argument('-N', '--number', type=int, default=100, help='Number of radial grid points')
 parser.add_argument('-s', '--save_time', type=float, default=.1, help='time interval between each save')
+
 # initial condition
 parser.add_argument('--h0', type=float, default=2e-4, help='Initial film thickness profile')
 args = parser.parse_args()
 
 # Read constants from command line
+save_file = os.path.abspath(args.save_file)
+
 # free parameters
 kappa = args.kappa    # Proportionality constant for contact line motion
-Pi0 = args.Pi0   # Initial pressure at the left boundary (Pa)
 theta_s = np.deg2rad(args.theta_s) # Equilibrium contact angle (degrees)
-pore_area = args.pore_area # Area of the pores (m^2)
 
 # Physical
 sigma = args.sigma  # Surface tension (N/m)
@@ -118,7 +121,7 @@ def film_drainage(t, y, x, X, rho, g, mu, sigma, theta_s):
     # Reynolds equation
     dhdt = np.zeros(h.shape)
     h3 =  h**3
-    dhdt[1:-1] = 1 / (12 * mu) * ((h3[2:] - h3[:-2]) * (p[2:] - p[:-2]) + 4 * h3[1:-1] * (p[2:] - 2 * p[1:-1] + p[:-2])) / dx**2
+    dhdt[1:-1] = 1 / (12 * mu) * ((h3[2:] - h3[:-2]) * (p[2:] - p[:-2]) + 4 * h3[1:-1] * (p[2:] - 2 * p[1:-1] + p[:-2])) / dx**2 
 
     # boundary conditions
     U_cl = contact_line_velocity(h, x, sigma, mu, theta_s, kappa=kappa)
@@ -185,11 +188,11 @@ t_eval = np.linspace(0, T, nSave)
 solution = solve_ivp(film_drainage, [0, T], h, method='BDF', t_eval=t_eval, args=(x, X, rho, g, mu, sigma, theta_s), atol=1e-6, rtol=1e-6)  # BDF method is suitable for stiff problems
 
 # create save_folder
-save_folder = os.path.dirname(args.save_file)
+save_folder = os.path.dirname(save_file)
 if not os.path.exists(save_folder):
     os.makedirs(save_folder)
 
 # Save the solution in txt file, index name x
 data = pd.DataFrame(data=solution.y*1e3, index=x*1e3, columns=solution.t)
 data.index.name = 'x'
-data.to_csv(args.save_file)
+data.to_csv(save_file)

@@ -1,4 +1,4 @@
-\documentclass[aps,pre,onecolumn,superscriptaddress,notitlepage,10pt]{revtex4-2}
+\documentclass[aps,preprint]{revtex4-2}
 
 \usepackage{amsmath,amsfonts,amssymb,bm}
 \usepackage{graphicx}
@@ -6,7 +6,7 @@
 \usepackage{times}
 \usepackage{float}
 \usepackage{xr}
-
+\renewcommand{\thefigure}{S\arabic{figure}}
 % Title and Author Information
 \begin{document}
 
@@ -18,6 +18,7 @@
 \author{Yicong Fu}
 \author{Ahbradeep Maitra}
 \affiliation{Department of Mechanical and Aerospace Engineering, Cornell University, Ithaca, NY 14853, USA}
+\author{Justin Chen}
 \author{Sunghwan Jung}
 \affiliation{Department of Biological and Environmental Engineering, Cornell University, Ithaca, NY 14853, USA}
 \date{\today}
@@ -80,7 +81,7 @@ Here, we simulate the surface profile evolutions varying all the parameters to a
 
 \section{Relation between dimple thickness and initial thickness}
 
-The dimple thickness and the initial film thickness $h_0$ is closely correlated. 
+The dimple thickness $h$ and the initial film thickness $h_0$ are closely correlated. 
 Generally, smaller $h_0$ leads to smaller dimple thickness. 
 This relation is almost linear for large $h_0$, but can get highly non-linear for small $h_0$, as evidenced by the data shown in Fig.~\ref{fig:dimple-thickness-relation}.
 
@@ -127,8 +128,10 @@ Although my scaling analysis predicts that the dimple time should decrease when 
 % \end{thebibliography}
 
 \newpage
-\section{Supplementary Video}
+\section{Supplementary Videos}
 
-Video S1. Bottom view of the scanning process (top), and the surface profiles measured by the displacement sensor (bottom). The video is played at real time. 
+Video S1: Formation of the fringe around a beet slice.
+
+Video S2: Bottom view of the scanning process (top), and the surface profiles measured by the displacement sensor (bottom). The video is played at real time. 
 
 \end{document}

@@ -18,8 +18,9 @@ for kappa, theta_s in zip(kappa_list, theta_s_list):
             for h0 in h0_list:
                 for L in L_list:
                     # print the file name
+                    N = max(200, int(1000 * L / 0.2))
                     filename = f'mu_{mu:.2e}_sigma_{sigma:.2e}_h0_{h0:.2e}_L_{L:.2e}.csv'
                     print(filename)
                     # Run the simulation
                     fileDir = os.path.join(folder, filename)
-                    os.system(f'python dimple_simulation.py \"{fileDir}\" --kappa {kappa:.2e}  --theta_s {theta_s:.2e} --h0 {h0:.2e} --mu {mu:.2e} --sigma {sigma:.2e} -X {L:.2e} -T 200 -s 0.1 -N 500')
+                    os.system(f'python dimple_simulation.py \"{fileDir}\" --kappa {kappa:.2e}  --theta_s {theta_s:.2e} --h0 {h0:.2e} --mu {mu:.2e} --sigma {sigma:.2e} -X {L:.2e} -T 200 -s 0.1 -N {N:d}')

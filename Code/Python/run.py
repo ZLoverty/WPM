@@ -5,12 +5,12 @@ import numpy as np
 h0_list = [0.3e-3]
 st_list = [42e-3]
 viscosity_list = [1e-2]
-L_list = np.logspace(-2, -0.5, 50)
+L_list = np.logspace(np.log10(0.01), np.log10(.1), 30)  # L from 0.2 to 1.0 in 5 steps
 theta_s_list = [17.4]
 kappa_list = [2.2e-4]
 
 
-folder = r"G:\My Drive\Research projects\WPM\Data\Simulation\parameters\length_more"
+folder = r"G:\My Drive\Research projects\WPM\Data\Simulation\parameters\length"
 
 for kappa, theta_s in zip(kappa_list, theta_s_list):
     for mu in viscosity_list:
@@ -18,7 +18,7 @@ for kappa, theta_s in zip(kappa_list, theta_s_list):
             for h0 in h0_list:
                 for L in L_list:
                     # print the file name
-                    N = max(200, int(1000 * L / 0.2))
+                    N = max(500, int(1000 * L / 0.2))
                     filename = f'mu_{mu:.2e}_sigma_{sigma:.2e}_h0_{h0:.2e}_L_{L:.2e}.csv'
                     print(filename)
                     # Run the simulation

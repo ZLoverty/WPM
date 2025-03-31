@@ -74,5 +74,9 @@ What if we only claim the proportionality between $h_d$ and $l_d$? In some cases
 This observation may justify the proportionality $h_d\propto l_d$ at early times. With this proportionality, we can write  
 
 $$
-h_d \propto \frac{ \rho g}{\sigma L}h_0^4.
+h_d \propto \frac{ \rho g}{\sigma l_m}h_m^4.
 $$
+
+I find it difficult to justify the relation between $h_m \propto l_m$ . The only way I can think of right now is to use experimental or simulation data. This is not helpful because that's exactly what we were trying to avoid: using experimental data to justify $h_\mathrm{dimple}\propto h_0^{2.5}$. Since we will have to use experimental data any way, this is not worth pursuing. Instead, we show that the $h_\mathrm{dimple}\propto h_0^{2.5}$ scaling is not sensitive to the choice of the specific time. At early stage of the dimple formation (~1 s), this scaling is robust. We show below the relation between $h_\mathrm{dimple}$ and $h_0$ at two other times $t=0.1$ s and $t=2.0$ s. 
+
+<img src="/assets/images/2025/03/h-h0-different-time.png" width="700px">

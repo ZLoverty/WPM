@@ -24,4 +24,7 @@ for kappa, theta_s in zip(kappa_list, theta_s_list):
                     print(time.asctime() + " -> " + filename)
                     # Run the simulation
                     fileDir = os.path.join(folder, filename)
+                    if os.path.exists(fileDir):
+                        print(f"File {filename} already exists, skipping.")
+                        continue
                     os.system(f'python dimple_simulation.py \"{fileDir}\" --kappa {kappa:.2e}  --theta_s {theta_s:.2e} --h0 {h0:.2e} --mu {mu:.2e} --sigma {sigma:.2e} -X {L:.2e} -T 200 -s 0.1 -N {N:d}')

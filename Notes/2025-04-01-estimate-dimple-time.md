@@ -24,10 +24,10 @@ $$
 or
 
 $$
-\tau = \frac{3\mu \mathcal{L}^2}{\rho g\mathcal{H^3}}.
+\tau = \frac{3\mu \mathcal{L}^2}{\rho g\mathcal{H}^3}.
 $$
 
-We define the dimple time as the time when the height ratio between dimple and bulk apex $h_\mathrm{min}/h_\mathrm{max}$ reaches 0.5. This definition bears experimental significance, but the dominating force (curvature or gravity) is not clear. It is possible that, depending on the initial geometry, both could be the dominating force at dimple time. To gain some insight, we examine our simulated data, focusing on the pressure contribution at the dimple. Below, we plot the gravity and curvature terms separately at the dimple, at dimple time $t_\mathrm{dimple}$, for film length $L$ ranging from 15 to 100 mm ($h_0=0.3$ mm).
+We define the dimple time $t_\mathrm{dimple}$ as the time when the height ratio between dimple and bulk apex $h_\mathrm{min}/h_\mathrm{max}$ reaches 0.5. This definition bears experimental significance, but the dominating force (curvature or gravity) at $t_\mathrm{dimple}$ is not clear. It is possible that, depending on the initial geometry, both could be the dominating force at dimple time. To gain some insight, we examine our simulated data, focusing on the pressure contribution at the dimple. Below, we plot the gravity and curvature terms separately at the dimple, at dimple time $t_\mathrm{dimple}$, for film length $L$ ranging from 15 to 100 mm ($h_0=0.3$ mm).
 
 <img src="/assets/images/2025/04/pressure-contribution-length.png" width=400px>
 
@@ -40,10 +40,16 @@ In the longer film, the dimple formation barely affect the height of the bulk fi
 All our experiments were conducted at $L=24$ mm. Interestingly, at this length, the curvature pressure and the gravity pressure have similar contribution, meaning that we can use either $\tau$ scale to estimate dimple time. Below, we plot half of the gravity time, with the measured dimple time, at various $h_0$. Note that we use $\mathcal{H}\sim h_0$ and $\mathcal{L}\sim L$ here:
 
 $$
-\tau_g = \frac{1}{2}\frac{3\mu L^2}{\rho gh_0^3}.
+\tau_g = \frac{3\mu L^2}{\rho gh_0^3}.
 $$
 
-<img src="/assets/images/2025/04/gravity-estimate.png" width=400px>
+Using the curvature time scale to estimate dimple time is a little trickier, because the length scales $\mathcal{L}$ and $\mathcal{H}$ should be specific to the geometry of the dimple, rather than the initial film. Actually, the deviation of gravity estimate at the small $h_0$ limit is due to the assumption $\mathcal{L}\sim L$ getting worse: the curvature is still not well approximated by $h_0/L^2$, and a better approximation would be $h_0/\lambda^2$, where $\lambda$ is the dimple spreading length. This leads to the following approximation of dimple time based on dimple curvature:
 
+$$
+\tau_c = \frac{3\mu\mathcal{L}^4}{\sigma \mathcal{H}^3} \approx \frac{3\mu\lambda^4}{\sigma h_0^3}.
+$$
 
-Using the curvature time scale to estimate dimple time is a little trickier, because the length scales $\mathcal{L}$ and $\mathcal{H}$ should be specific to the geometry of the dimple, rather than the initial film. Actually, the deviation of gravity estimate at the small $h_0$ limit is due to the assumption $\mathcal{H}\sim h_0$ getting worse, as examplified by the short and long film evolutions. To estimate dimple time using curvature time scale, we use $\mathcal{H}\sim h_\mathrm{min}$ and $\mathcal{L}\sim \lambda$, where $\lambda$ is the dimple spreading length, and $h_\mathrm{min}$ is the dimple thickness at $t_\mathrm{dimple}$ ($h_\mathrm{max}$ might be a better $\mathcal{H}$ for the gravity time scale).
+<img src="/assets/images/2025/04/tau-g-and-tau-c.png" width=400px>
+
+As can be seen, in this regime, both $\tau_g$ and $\tau_c$ approximate $t_\mathrm{dimple}$ well. However, it is worth noting that these approximations can be very off when $h_0$ and $L$ are different, and we still need to examine the pressure contribution at $t_\mathrm{dimple}$ to determine whether $\tau_g$ or $\tau_c$ is a better approximation. 
+

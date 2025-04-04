@@ -61,6 +61,7 @@ Aug 14, 2024: Initial commit.
 Aug 15, 2024: (i) Edit the docstring to show optional arguments more accurately. (ii) Prevent the increase of total volume due to contact line movement.
 Oct 24, 2024: Change the model from micro-pore driven to meniscus rise driven.
 Nov 05, 2024: (i) Remove unused free parameters. (ii) Convert save_file to absolute path. (iii) Add custom boundary conditions to enable different boundary conditions using the same code.
+Apr 03, 2025: Change default liquid properties to beet juice properties.
 """
 
 import numpy as np
@@ -80,8 +81,8 @@ parser.add_argument('--mu', type=float, default=1e-2, help='Viscosity, Pa s')
 parser.add_argument('--g', type=float, default=9.8, help='Gravitational acceleration, m/s^2')
 parser.add_argument('--sigma', type=float, default=42e-3, help='Surface tension, N/m')
 parser.add_argument('--rho', type=float, default=997, help='Density of water, kg/m^3')
-parser.add_argument('-k', '--kappa', type=float, default=0.005, help='Proportionality constant for contact line motion')
-parser.add_argument('-t', '--theta_s', type=float, default=30, help='Equilibrium contact angle (degrees)')
+parser.add_argument('-k', '--kappa', type=float, default=2.2e-4, help='Proportionality constant for contact line motion')
+parser.add_argument('-t', '--theta_s', type=float, default=17.4, help='Equilibrium contact angle (degrees)')
 
 # simulation parameters
 parser.add_argument('-T', '--time', type=float, default=100, help='Total simulation time (s)')
@@ -161,6 +162,7 @@ def YL_equation(h, x, sigma):
     dh = (h[2:] - h[:-2]) / dx / 2
     d2h = (h[2:] - 2 * h[1:-1] + h[:-2]) / dx**2
     p = np.zeros_like(h)
+    # p[1:-1] = - sigma * (1 + dh**2)**(-3/2) * d2h + rho * g * h[1:-1]
     p[1:-1] = - sigma * d2h + rho * g * h[1:-1]
 
     # Boundary conditions

@@ -41,31 +41,43 @@ $$
 \frac{\partial p}{\partial x}\bigg|_d \sim \sigma\frac{h_d}{l_d^3}.
 $$
 
-We also approximate $h_m$ as the initial film thickness $h_0$, $h_m\sim h_0$, which should be pretty accurate for the length of films we work with. Lastly, we approximate the pressure in the bulk film as induced by gravity, giving
+Lastly, we approximate the pressure in the bulk film as induced by gravity, giving
 
 $$
-\frac{\partial p}{\partial x}\bigg|_m \sim \frac{\rho g h_0}{L}.
+\frac{\partial p}{\partial x}\bigg|_m \sim \frac{\rho g h_m}{l_m}.
 $$
 
 Combine the approximations above, we get
 
 $$
-\sigma\frac{h_d^4}{l_d^3} \sim \frac{h_0^4 \rho g}{L}.
+\sigma\frac{h_d^4}{l_d^3} \sim \frac{h_m^4 \rho g}{l_m}.
 $$
 
-If we make a crude assumption $h_d\sim l_d$ here, we get
+We now make crude assumptions:
 
 $$
-h_d \sim \frac{ \rho g}{\sigma L} h_0^4.
+h_d \propto l_d,\, h_m \propto l_m.
+$$ 
+
+With these, we get
+
+$$
+ h_d \propto  \frac{\rho g}{\sigma} h_m^3.
 $$
 
-How is this approximation? Let's test with a specific case, where $\sigma=42\;\mathrm{mN/m}$, $\rho=1000\;\mathrm{kg/m^3}$, $g=9.8\;\mathrm{m/s^2}$, $L=24\;\mathrm{mm}$ and $h_0=0.3\;\mathrm{mm}$. With these numbers, we estimate $h_d$ to be
+Locally, at the dimple, the surface tension is balanced with the viscous drag, giving
 
 $$
-h_d \approx 79 \;\mathrm{nm},
+\frac{\sigma h_d}{l_d^2} \sim \frac{\mu l_d /\tau }{h_d^2},
 $$
 
-much smaller than expected. Clearly, some assumptions do not hold. Particularly, $h_d\sim l_d$ is problematic. We already know that $l_d$ should be close to capillary length (a few mm), and $h_d$ is typically much smaller than $h_0$, on the order of $0.01\;\mathrm{mm}$, so this approximation introduces huge error. 
+we can approximate the time scale $\tau$ as
+
+$$
+\tau \sim \frac{\mu l_d^4}{\sigma h_d^3}.
+$$
+
+Using the flux balance, we can construct the proportionality between $\tau$ and $h_m$
 
 What if we only claim the proportionality between $h_d$ and $l_d$? In some cases, this is probably close. But it's definitely not always true. Observing from the simulation data, it seems more true for early time, or long films. See two examples below. In the shorter film (left), we observe an increase of $h_d$ during the spreading, but later on $h_d$ becomes more constant, while keep spreading. In the longer film (right), $h_d$ and $l_d$ seem to be pretty linearly related. 
 

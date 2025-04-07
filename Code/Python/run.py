@@ -3,15 +3,15 @@ import numpy as np
 import time
 
 # h0_list = np.logspace(np.log10(0.2e-3), np.log10(1e-3), 100)
-h0_list = np.linspace(0.2e-3, 0.4e-3, 20)
-st_list = [42e-3]  # sigma from 0.01 to 0.1 in 5 steps
+h0_list = np.linspace(0.25e-3, 0.4e-3, 20)
+st_list = np.linspace(42e-3, 52e-3, 5)  # sigma from 0.01 to 0.1 in 5 steps
 viscosity_list = [1e-2]
-L_list = np.linspace(10e-3, 50e-3, 20)  # L from 0.2 to 1.0 in 5 steps
+L_list = np.linspace(10e-3, 50e-3, 5)  # L from 0.2 to 1.0 in 5 steps
 theta_s_list = [17.4]
 kappa_list = [2.2e-4]
 
 
-folder = r"C:\Users\liuzy\Documents\WPM_PD2"
+folder = r"C:\Users\liuzy\Documents\WPM_simulation\sigma"
 
 for kappa, theta_s in zip(kappa_list, theta_s_list):
     for mu in viscosity_list:

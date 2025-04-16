@@ -40,6 +40,7 @@ Oct 24, 2024: Change the model from micro-pore driven to meniscus rise driven.
 Nov 05, 2024: (i) Remove unused free parameters. (ii) Convert save_file to absolute path. (iii) Add custom boundary conditions to enable different boundary conditions using the same code.
 Apr 03, 2025: Change default liquid properties to beet juice properties.
 Apr 08, 2025: (i) Simplify the code: fix BC as Neumann; (ii) Use operators and sparse matrices for computing derivatives; (iii) Remove redundant arguments.
+Apr 16, 2025: (i) Use LSODA method for efficiency; (ii) Save the solution in hdf5 format for storage space efficiency; (iii) Print simulation time. 
 """
 
 import numpy as np
@@ -49,7 +50,8 @@ import os
 import argparse
 import pdb
 import pandas as pd
-from scipy.sparse import diags, kron, identity
+from scipy.sparse import diags
+import time
 
 # Read constants from command line
 parser = argparse.ArgumentParser(description='Dimple simulation')
@@ -76,18 +78,6 @@ args = parser.parse_args()
 
 # Read constants from command line
 save_file = os.path.abspath(args.save_file)
-
-# # boundary conditions
-# if args.bc is not None:
-#     import json
-#     with open(args.bc) as f:
-#         bc = json.load(f)
-#     print(bc)
-#     p_left = bc["p_left"]
-#     p_right = bc["p_right"]
-# else:
-#     p_left = {"type": "Neumann", "value": 0.0}
-#     p_right = {"type": "Neumann", "value": 0.0}
 
 # Physical
 sigma = args.sigma  # Surface tension (N/m)
@@ -172,10 +162,15 @@ def compute_contact_angle_0(h):
             angle += np.pi
         return angle
 
+t1 = time.time()
+
 # Solve the PDE using solve_ivp with the BDF method
 nSave = int(T / save_time)
 t_eval = np.linspace(0, T, nSave)
-solution = solve_ivp(film_drainage, [0, T], h, method='BDF', t_eval=t_eval, atol=1e-6, rtol=1e-6)  # BDF method is suitable for stiff problems
+solution = solve_ivp(film_drainage, [0, T], h, method='LSODA', t_eval=t_eval, atol=1e-6, rtol=1e-6)  # BDF method is suitable for stiff problems
+
+t2 = time.time()
+print(f"Simulation time: {t2 - t1:.2f} seconds")
 
 # create save_folder
 save_folder = os.path.dirname(save_file)
@@ -185,4 +180,4 @@ if not os.path.exists(save_folder):
 # Save the solution in txt file, index name x
 data = pd.DataFrame(data=solution.y*1e3, index=x*1e3, columns=solution.t)
 data.index.name = 'x'
-data.to_csv(save_file)
+data.to_hdf(save_file, key="data")

@@ -70,6 +70,7 @@ parser.add_argument('-T', '--time', type=float, default=200, help='Total simulat
 parser.add_argument('-X', '--X', type=float, default=24e-3, help='Size of the domain (m)')
 parser.add_argument('-N', '--number', type=int, default=200, help='Number of radial grid points')
 parser.add_argument('-s', '--save_time', type=float, default=.1, help='time interval between each save')
+parser.add_argument('--tscale', type=str, default='linear', choices=['linear', 'log'], help='Time scale for the simulation.')
 # parser.add_argument('--bc', type=str, default=None, help='The path to the json file that specifies the boundary conditions.')
 
 # initial condition
@@ -116,9 +117,7 @@ def film_drainage(t, y):
     p = YL_equation(h)
     
     # Reynolds equation
-    # h3 =  h**3
-    # dhdt[1:-1] = 1 / (12 * mu) * ((h3[2:] - h3[:-2]) * (p[2:] - p[:-2]) + 4 * h3[1:-1] * (p[2:] - 2 * p[1:-1] + p[:-2])) / dx**2 
-    dhdt = 1 / (3*mu) * ( 3 * h**2 * (Dx @ h) * (Dx @ p) + h**3 * (D2x @ p) )  # 1D Reynolds equation)
+    dhdt = 1 / (3*mu) * ( 3 * h**2 * (Dx @ h) * (Dx @ p) + h**3 * (D2x @ p) ) 
 
     # boundary conditions
     dhdt[0] = contact_line_velocity(h)
@@ -133,7 +132,6 @@ def film_drainage(t, y):
 def YL_equation(h):
 
     p = - sigma * (1 + (Dx @ h)**2)**(-3/2) * (D2x @ h) + rho * g * h
-    # p = - sigma * (D2x @ h) + rho * g * h / 2
 
     p[0] = p[1]
     p[-1] = p[-2]
@@ -165,9 +163,14 @@ def compute_contact_angle_0(h):
 t1 = time.time()
 
 # Solve the PDE using solve_ivp with the BDF method
-nSave = int(T / save_time)
-t_eval = np.linspace(0, T, nSave)
-solution = solve_ivp(film_drainage, [0, T], h, method='LSODA', t_eval=t_eval, atol=1e-6, rtol=1e-6)  # BDF method is suitable for stiff problems
+
+if args.tscale == "log":
+    nSave = 1000 # int(T / save_time)
+    t_eval = np.logspace(-3, np.log10(T), nSave)
+elif args.tscale == "linear":
+    nSave = int(T / save_time)
+    t_eval = np.linspace(0, T, nSave)
+solution = solve_ivp(film_drainage, [0, t_eval[-1]], h, method='BDF', t_eval=t_eval, atol=1e-6, rtol=1e-6)  # BDF method is suitable for stiff problems
 
 t2 = time.time()
 print(f"Simulation time: {t2 - t1:.2f} seconds")

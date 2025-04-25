@@ -13,6 +13,7 @@ Edit
 ----
 Apr 16, 2025: Initial commit.
 Apr 23, 2025: (i) Add gravity length scale to the dimple time computation. (ii) Reorganize the code with functions: each function will compute one thing, and if it is not available, it will return NaN.
+Apr 25, 2025: Compute Vm using the part above h0 instead of the dimple location.
 """
 
 import argparse
@@ -62,8 +63,15 @@ def compute_minima_maxima(x, y):
             lm = np.nan
         else:
             lm = (x[h0_ind+minima_index] - x[minima_index])
-        h = y[:minima_index]
-        Vm = integrate.trapezoid(h-y[minima_index], x=x[:minima_index])
+        # Find the first point in h that's below h0
+        h_below_h0_inds = y < h0 * 1e3
+        if np.any(h_below_h0_inds):
+            first_below_h0 = np.where(h_below_h0_inds)[0][0]
+            h = y[:first_below_h0]
+            Vm = integrate.trapezoid(h-h0, x=x[:first_below_h0])
+        else:
+            Vm = np.nan
+        
     else:
         minima_index, maxima_index = np.nan, np.nan
         minima, maxima = np.nan, np.nan
